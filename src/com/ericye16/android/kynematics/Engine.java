@@ -1,13 +1,10 @@
 package com.ericye16.android.kynematics;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -16,22 +13,22 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Environment;
-import android.text.format.Time;
+import android.util.Log;
 
 public class Engine implements SensorEventListener {
 	private boolean isCollecting = false;
 	private final Activity activity;
 	private SensorManager sensorManager;
-	private Sensor accel;
-	private BufferedWriter[] dataStream;
+	private Sensor allSensors;
+	private BufferedWriter[] dataWriters;
 	final static int ACCEL_FILE = 0;
 	final static int GYRO_FILE = 1;
 	
 	public Engine(Activity activity) {
 		this.activity = activity;
 		sensorManager = (SensorManager) activity.getSystemService(Activity.SENSOR_SERVICE);
-		accel = sensorManager.getDefaultSensor(Sensor.TYPE_ALL);
-		dataStream = new BufferedWriter[2];
+		allSensors = sensorManager.getDefaultSensor(Sensor.TYPE_ALL);
+		dataWriters = new BufferedWriter[2];
 	}
 	
 	public boolean isCollecting() {
@@ -48,6 +45,7 @@ public class Engine implements SensorEventListener {
 	}
 	
 	private void start() throws IOException {
+		Log.i("Engine.start", "Starting collection");
 		if (!isExternalStorageWritable()) throw new IOException();
 		GregorianCalendar time = new GregorianCalendar();
 		String timeString = "" + time.get(Calendar.YEAR) + time.get(Calendar.MONTH) +
@@ -56,16 +54,17 @@ public class Engine implements SensorEventListener {
 		System.out.println(timeString);
 		File rootDir = new File(Environment.getExternalStorageDirectory(), timeString);
 		rootDir.mkdir();
-		dataStream[ACCEL_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "accel.csv")));
-		dataStream[GYRO_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "gyro.csv")));
-		sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_FASTEST);
+		dataWriters[ACCEL_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "accel.csv")));
+		dataWriters[GYRO_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "gyro.csv")));
+		sensorManager.registerListener(this, allSensors, SensorManager.SENSOR_DELAY_FASTEST);
 	}
 	
 	private void stop() {
+		Log.i("Engine.stop", "Stopping collection");
 		sensorManager.unregisterListener(this);
 		try {
-			for (BufferedWriter stream: dataStream) {
-				stream.close();
+			for (BufferedWriter writer: dataWriters) {
+				writer.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -88,20 +87,25 @@ public class Engine implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent sensorEvent) {
+		Log.d("Engine.onSensorChanged", "sensor value changed");
 		switch (sensorEvent.sensor.getType()) {
 		case Sensor.TYPE_LINEAR_ACCELERATION:
 			writeAccelData(sensorEvent);
+			Log.d("Engine.onSensorChanged", "Accel reading");
 			break;
 		case Sensor.TYPE_ROTATION_VECTOR:
 			writeRotationData(sensorEvent);
+			Log.d("Engine.onSensorChanged", "Rotation reading");
+			break;
 		default:
+			Log.d("Engine.onSensorChanged", "Not sensor we want");
 			break;
 		}
 	}
 	
 	private void writeAccelData(SensorEvent sensorEvent) {
 		try {
-			dataStream[ACCEL_FILE].write(sensorEvent.timestamp + "," + 
+			dataWriters[ACCEL_FILE].write(sensorEvent.timestamp + "," + 
 					sensorEvent.values[0] + "," + sensorEvent.values[1] + "," +
 					sensorEvent.values[2] + "\n");
 		} catch (IOException e) {
@@ -111,7 +115,7 @@ public class Engine implements SensorEventListener {
 	
 	private void writeRotationData(SensorEvent sensorEvent) {
 		try {
-			dataStream[GYRO_FILE].write(sensorEvent.timestamp + "," +
+			dataWriters[GYRO_FILE].write(sensorEvent.timestamp + "," +
 					sensorEvent.values[0] + "," + sensorEvent.values[1] + "," + 
 					sensorEvent.values[2] + "," + sensorEvent.values[3] + "," +
 					sensorEvent.values[3] + "," + sensorEvent.values[4] + "\n");
