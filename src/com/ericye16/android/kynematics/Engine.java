@@ -19,7 +19,7 @@ public class Engine implements SensorEventListener {
 	private boolean isCollecting = false;
 	private final Activity activity;
 	private SensorManager sensorManager;
-	private Sensor allSensors;
+	private Sensor[] allSensors = new Sensor[2];
 	private BufferedWriter[] dataWriters;
 	final static int ACCEL_FILE = 0;
 	final static int GYRO_FILE = 1;
@@ -27,7 +27,8 @@ public class Engine implements SensorEventListener {
 	public Engine(Activity activity) {
 		this.activity = activity;
 		sensorManager = (SensorManager) activity.getSystemService(Activity.SENSOR_SERVICE);
-		allSensors = sensorManager.getDefaultSensor(Sensor.TYPE_ALL);
+		allSensors[0] = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+		allSensors[1] = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 		dataWriters = new BufferedWriter[2];
 	}
 	
@@ -52,16 +53,23 @@ public class Engine implements SensorEventListener {
 				time.get(Calendar.DATE) + time.get(Calendar.HOUR_OF_DAY) + 
 				time.get(Calendar.MINUTE) + time.get(Calendar.SECOND);
 		System.out.println(timeString);
-		File rootDir = new File(Environment.getExternalStorageDirectory(), timeString);
-		rootDir.mkdir();
+		File rootDir = new File(
+				new File(Environment.getExternalStorageDirectory(),
+						"Kynematics"), 
+						timeString);
+		rootDir.mkdirs();
 		dataWriters[ACCEL_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "accel.csv")));
 		dataWriters[GYRO_FILE] = new BufferedWriter(new FileWriter(new File(rootDir, "gyro.csv")));
-		sensorManager.registerListener(this, allSensors, SensorManager.SENSOR_DELAY_FASTEST);
+		for (Sensor sensor: allSensors) {
+			sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+		}
 	}
 	
 	private void stop() {
 		Log.i("Engine.stop", "Stopping collection");
-		sensorManager.unregisterListener(this);
+		for (Sensor sensor: allSensors) {
+			sensorManager.unregisterListener(this, sensor);
+		}
 		try {
 			for (BufferedWriter writer: dataWriters) {
 				writer.close();
