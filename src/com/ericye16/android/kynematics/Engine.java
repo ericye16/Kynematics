@@ -23,12 +23,17 @@ public class Engine implements SensorEventListener {
 	private BufferedWriter[] dataWriters;
 	final static int ACCEL_FILE = 0;
 	final static int GYRO_FILE = 1;
+	private long prevtimestamp = 0;
+	float[] R = new float[9];
+	float[] I = new float[9];
+	float[] orientation = new float[3];
+	Position position = new Position(R, I, orientation);
 	
 	public Engine(Activity activity) {
 		this.activity = activity;
 		sensorManager = (SensorManager) activity.getSystemService(Activity.SENSOR_SERVICE);
 		allSensors[0] = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-		allSensors[1] = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+		allSensors[1] = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 		dataWriters = new BufferedWriter[2];
 	}
 	
@@ -101,9 +106,9 @@ public class Engine implements SensorEventListener {
 			writeAccelData(sensorEvent);
 			Log.d("Engine.onSensorChanged", "Accel reading");
 			break;
-		case Sensor.TYPE_ROTATION_VECTOR:
+		case Sensor.TYPE_ORIENTATION:
 			writeRotationData(sensorEvent);
-			Log.d("Engine.onSensorChanged", "Rotation reading");
+			Log.d("Engine.onSensorChanged", "Orientation reading");
 			break;
 		default:
 			Log.d("Engine.onSensorChanged", "Not sensor we want");
@@ -119,6 +124,11 @@ public class Engine implements SensorEventListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		position.update(sensorEvent.values, sensorEvent.timestamp - prevtimestamp);
+		if (SensorManager.getRotationMatrix(R, I, null, null)) {
+			orientation = SensorManager.getOrientation(R, orientation);
+			
+		}
 	}
 	
 	private void writeRotationData(SensorEvent sensorEvent) {
@@ -126,7 +136,7 @@ public class Engine implements SensorEventListener {
 			dataWriters[GYRO_FILE].write(sensorEvent.timestamp + "," +
 					sensorEvent.values[0] + "," + sensorEvent.values[1] + "," + 
 					sensorEvent.values[2] + "," + sensorEvent.values[3] + "," +
-					sensorEvent.values[3] + "," + sensorEvent.values[4] + "\n");
+					sensorEvent.values[3] + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
