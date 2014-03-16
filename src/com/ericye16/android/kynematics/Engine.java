@@ -17,23 +17,20 @@ import android.util.Log;
 
 public class Engine implements SensorEventListener {
 	private boolean isCollecting = false;
-	private final Activity activity;
+	private final MainActivity activity;
 	private SensorManager sensorManager;
 	private Sensor[] allSensors = new Sensor[2];
 	private BufferedWriter[] dataWriters;
 	final static int ACCEL_FILE = 0;
 	final static int GYRO_FILE = 1;
 	private long prevtimestamp = 0;
-	float[] R = new float[9];
-	float[] I = new float[9];
-	float[] orientation = new float[3];
-	Position position = new Position(R, I, orientation);
+	Position position = new Position();
 	
 	public Engine(Activity activity) {
-		this.activity = activity;
+		this.activity = (MainActivity) activity;
 		sensorManager = (SensorManager) activity.getSystemService(Activity.SENSOR_SERVICE);
 		allSensors[0] = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-		allSensors[1] = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+		allSensors[1] = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 		dataWriters = new BufferedWriter[2];
 	}
 	
@@ -100,15 +97,15 @@ public class Engine implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent sensorEvent) {
-		Log.d("Engine.onSensorChanged", "sensor value changed");
+		//Log.d("Engine.onSensorChanged", "sensor value changed");
 		switch (sensorEvent.sensor.getType()) {
 		case Sensor.TYPE_LINEAR_ACCELERATION:
 			writeAccelData(sensorEvent);
-			Log.d("Engine.onSensorChanged", "Accel reading");
+			//Log.d("Engine.onSensorChanged", "Accel reading");
 			break;
-		case Sensor.TYPE_ORIENTATION:
+		case Sensor.TYPE_ROTATION_VECTOR:
 			writeRotationData(sensorEvent);
-			Log.d("Engine.onSensorChanged", "Orientation reading");
+			//Log.d("Engine.onSensorChanged", "Orientation reading");
 			break;
 		default:
 			Log.d("Engine.onSensorChanged", "Not sensor we want");
@@ -117,28 +114,33 @@ public class Engine implements SensorEventListener {
 	}
 	
 	private void writeAccelData(SensorEvent sensorEvent) {
-		try {
+		if (sensorEvent.values == null || sensorEvent.values.length != 3) {
+			Log.e("Engine.writeAccelData", "sensorEvent values length incorrect");
+			return;
+		}
+		/*try {
 			dataWriters[ACCEL_FILE].write(sensorEvent.timestamp + "," + 
 					sensorEvent.values[0] + "," + sensorEvent.values[1] + "," +
 					sensorEvent.values[2] + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		position.update(sensorEvent.values, sensorEvent.timestamp - prevtimestamp);
-		if (SensorManager.getRotationMatrix(R, I, null, null)) {
-			orientation = SensorManager.getOrientation(R, orientation);
-			
-		}
+		}*/
+		//position.update(sensorEvent.values, sensorEvent.timestamp - prevtimestamp);
+		prevtimestamp = sensorEvent.timestamp;
+		//activity.updateAccel(sensorEvent.values);
+		//activity.updatePos(position.getPos());
 	}
 	
 	private void writeRotationData(SensorEvent sensorEvent) {
-		try {
+		/*try {
 			dataWriters[GYRO_FILE].write(sensorEvent.timestamp + "," +
 					sensorEvent.values[0] + "," + sensorEvent.values[1] + "," + 
-					sensorEvent.values[2] + "," + sensorEvent.values[3] + "," +
-					sensorEvent.values[3] + "\n");
+					sensorEvent.values[2] + "," + sensorEvent.values[3] + "," + 
+					sensorEvent.values[4] + "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		//position.updateRotation(sensorEvent.values);
+		//activity.updateRot(sensorEvent.values);
 	}
 }

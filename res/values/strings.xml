@@ -9,8 +9,8 @@
     <string name="not_running">Not running</string>
     <string name="running">Running</string>
     <string name="zeros">(0, 0, 0)</string>
-    <string name="accel">Accel</string>
-    <string name="rotation">Rotation</string>
-    <string name="position">Position</string>
+    <string name="accel">Accel: </string>
+    <string name="rotation">Rotation: </string>
+    <string name="position">Position: </string>
 
 </resources>

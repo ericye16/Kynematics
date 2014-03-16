@@ -23,7 +23,18 @@
         android:id="@+id/accel_status"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/zeros"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="@string/accel" />
+    
+    <TextView 
+        android:id="@+id/rotation_status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/rotation" />
+    
+    <TextView 
+        android:id="@+id/position_status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/position" />
 
 </LinearLayout>
