@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-	Engine engine;
 	TextView accel_status;
 	TextView rot_status;
 	TextView pos_status;
@@ -21,7 +20,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		engine = new Engine(this);
 		accel_status = (TextView) findViewById(R.id.accel_status);
 		rot_status = (TextView) findViewById(R.id.rotation_status);
 		pos_status = (TextView) findViewById(R.id.position_status);
@@ -35,21 +33,9 @@ public class MainActivity extends Activity {
 	}
 	
 	public void startOrStop(View view) {
-		try {
-			engine.startOrStop();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		TextView status = (TextView)findViewById(R.id.status);
 		Button button = (Button) findViewById(R.id.button);
-		if (engine.isCollecting()) {
-			status.setText(R.string.running);
-			button.setText(R.string.stop_button);
-		} else {
-			status.setText(R.string.not_running);
-			button.setText(R.string.start_button);
-		}
 	}
 	
 	public void updateAccel(float[] accel) {
