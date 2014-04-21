@@ -13,18 +13,20 @@ class KynRunner implements SensorEventListener {
 	final private float[] position;
 	final private float[] R;
 	final private float[] velocity;
+	final private float[] lastAcceleration;
 	final private Sensor linearAccelerationSensor;
 	final private Sensor rotationVectorSensor;
 	private long prev_timestamp = -1;
 	
-	public KynRunner(Context context, float[] position, float[] velocity, float[] rotationMatrix,
-			Sensor linearAccelerationSensor, Sensor rotationSensor) {
+	public KynRunner(Context context, float[] position, float[] velocity, float[] lastAcceleration, 
+			float[] rotationMatrix, Sensor linearAccelerationSensor, Sensor rotationSensor) {
 		this.context = context;
 		this.position = position;
 		this.velocity = velocity;
 		this.R = rotationMatrix;
 		this.linearAccelerationSensor = linearAccelerationSensor;
 		this.rotationVectorSensor = rotationSensor;
+		this.lastAcceleration = lastAcceleration;
 	}
 
 	@Override
@@ -37,6 +39,9 @@ class KynRunner implements SensorEventListener {
 	public void onSensorChanged(SensorEvent sensorEvent) {
 		Log.d("KynRunner.onSensorChanged", "Event on sensor " + sensorEvent.sensor.toString() + "\n");
 		if (sensorEvent.sensor == linearAccelerationSensor) {
+			lastAcceleration[0] = sensorEvent.values[0];
+			lastAcceleration[1] = sensorEvent.values[1];
+			lastAcceleration[2] = sensorEvent.values[2];
 			if (prev_timestamp == -1 || (sensorEvent.timestamp - prev_timestamp > 200000684)) { //first run [in a while], ignore sensor and just update timestamp
 				prev_timestamp = sensorEvent.timestamp;
 			} else {

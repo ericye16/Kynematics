@@ -26,6 +26,7 @@ public class Kynematics {
 	private boolean isRunning = false;
 	final private float[] position = new float[] {0, 0, 0};
 	final private float[] velocity = new float[] {0, 0, 0};
+	final private float[] lastAcceleration = new float[] {0, 0, 0};
 	final private float[] rotationMatrix = new float[] 
 			{0,0,0,0,
 			0,0,0,0,
@@ -47,8 +48,8 @@ public class Kynematics {
 		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 		linearAccelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-		kynRunner = new KynRunner(context, position, rotationMatrix, velocity,
-				linearAccelerationSensor, rotationVectorSensor);
+		kynRunner = new KynRunner(context, position, velocity, lastAcceleration, 
+				rotationMatrix, linearAccelerationSensor, rotationVectorSensor);
 		reset();
 	}
 	
@@ -128,6 +129,15 @@ public class Kynematics {
 	 */
 	public float[] getVelocity() {
 		return velocity;
+	}
+	
+	/**
+	 * Gets the last set of acceleration values. Contains 3 elements, which correspond
+	 * to the x-, y- and z-axes respectively.
+	 * @return
+	 */
+	public float[] getLastAcceleration() {
+		return lastAcceleration;
 	}
 	
 	/**

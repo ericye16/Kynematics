@@ -1,6 +1,8 @@
 package com.ericye16.android.kynematics;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -14,7 +16,9 @@ public class MainActivity extends Activity {
 	TextView accel_status;
 	TextView rot_status;
 	TextView pos_status;
-
+	private Kynematics kynematics;
+	private Timer uiTimer;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -23,6 +27,32 @@ public class MainActivity extends Activity {
 		accel_status = (TextView) findViewById(R.id.accel_status);
 		rot_status = (TextView) findViewById(R.id.rotation_status);
 		pos_status = (TextView) findViewById(R.id.position_status);
+		kynematics = new Kynematics(this);
+		
+		//this has got to be the worst way of doing things.
+		//yo dawg, I heard you like threads.
+		uiTimer = new Timer();
+		uiTimer.scheduleAtFixedRate(new TimerTask() {
+
+			@Override
+			public void run() {
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						Log.d("uiTimer", "ui updated");
+						if (kynematics.isRunning()) {
+							updatePos(kynematics.getPosition());
+							updateAccel(kynematics.getLastAcceleration());
+							updateRot(kynematics.getRotationMatrix());
+						}
+					}
+					
+				});
+			}
+			
+		}, 0, 500);
+		
 	}
 
 	@Override
@@ -33,9 +63,17 @@ public class MainActivity extends Activity {
 	}
 	
 	public void startOrStop(View view) {
-		
 		TextView status = (TextView)findViewById(R.id.status);
 		Button button = (Button) findViewById(R.id.button);
+		if (kynematics.isRunning()) {
+			kynematics.stop();
+			status.setText(R.string.not_running);
+			button.setText(R.string.start_button);
+		} else {
+			kynematics.start();
+			status.setText(R.string.running);
+			button.setText(R.string.stop_button);
+		}
 	}
 	
 	public void updateAccel(float[] accel) {
@@ -48,8 +86,9 @@ public class MainActivity extends Activity {
 				accel[2] + ")");
 	}
 	
+	//current not working since I don't know how to properly display a rotation matrix
 	public void updateRot(float[] rot) {
-		if (rot.length != 5) {
+		if (rot.length != 16) {
 			Log.e("MainActivity.updateRot", "rot not correct length");
 			return;
 		}
