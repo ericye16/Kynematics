@@ -6,11 +6,13 @@
     <string name="hello_world">Hello world!</string>
     <string name="start_button">Start Collecting</string>
     <string name="stop_button">Stop Collecting</string>
+    <string name="reset">Reset</string>
     <string name="not_running">Not running</string>
     <string name="running">Running</string>
     <string name="zeros">(0, 0, 0)</string>
     <string name="accel">Accel: </string>
     <string name="rotation">Rotation: </string>
     <string name="position">Position: </string>
+    <string name="vel">Vel: </string>
 
 </resources>

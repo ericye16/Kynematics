@@ -37,21 +37,18 @@ class KynRunner implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent sensorEvent) {
-		Log.d("KynRunner.onSensorChanged", "Event on sensor " + sensorEvent.sensor.toString() + "\n");
 		if (sensorEvent.sensor == linearAccelerationSensor) {
 			lastAcceleration[0] = sensorEvent.values[0];
 			lastAcceleration[1] = sensorEvent.values[1];
 			lastAcceleration[2] = sensorEvent.values[2];
 			if (prevTimestamp == -1 || (sensorEvent.timestamp - prevTimestamp > 2000000684)) { //first run [in a while], ignore sensor and just update timestamp
 				prevTimestamp = sensorEvent.timestamp;
-				Log.d("KynRunner.onSensorChanged", "old timestamp at " + prevTimestamp);
 			} else {
-				long deltaT = sensorEvent.timestamp - prevTimestamp;
+				float deltaT = (sensorEvent.timestamp - prevTimestamp) / (float) 1e9;
 				prevTimestamp = sensorEvent.timestamp;
 				float[] a = sensorEvent.values;
 				velocity[0] = velocity[0] + deltaT * (R[0] * a[0] + R[1] * a[1] + 
 						R[2] * a[2]);
-				Log.d("KynRunner.onSensorChanged vel", "vel x: " + velocity[0]);
 				velocity[1] = velocity[1] + deltaT * (R[4] * a[0] + R[5] * a[1] +
 						R[6] * a[2]);
 				velocity[2] = velocity[2] + deltaT * (R[8] * a[0] + R[9] * a[1] + 

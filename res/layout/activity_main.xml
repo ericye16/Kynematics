@@ -17,13 +17,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="startOrStop"
-        android:text="@string/start_button" />
+        android:text="@string/start_button"
+        android:textAlignment="center" />
     
     <TextView
         android:id="@+id/accel_status"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/accel" />
+    
+    <TextView
+        android:id="@+id/vel_status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/vel" />
     
     <TextView 
         android:id="@+id/rotation_status"
@@ -36,5 +43,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/position" />
+    
+    <Button
+        android:id="@+id/reset_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="reset"
+        android:text="@string/reset"
+        android:textAlignment="center"
+        android:enabled="true" />
 
 </LinearLayout>

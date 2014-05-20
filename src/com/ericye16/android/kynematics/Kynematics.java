@@ -78,11 +78,16 @@ public class Kynematics {
 		for (int i = 0; i < 3; i++) {
 			position[i] = 0;
 			velocity[i] = 0;
+			lastAcceleration[i] = 0;
 		}
 		//zero out rotation matrix
 		for (int i = 0; i < 16; i++) {
 			rotationMatrix[i] = 0;
 		}
+		rotationMatrix[0] = 1;
+		rotationMatrix[5] = 1;
+		rotationMatrix[10] = 1;
+		rotationMatrix[15] = 1;
 	}
 	
 	/**
