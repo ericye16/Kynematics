@@ -93,8 +93,8 @@ public class Kynematics {
 		if (isRunning)
 			throw new IllegalStateException("Kynematics cannot be started because it is already running.");
 		
-		sensorManager.registerListener(kynRunner, linearAccelerationSensor, SensorManager.SENSOR_DELAY_NORMAL);
-		sensorManager.registerListener(kynRunner, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+		sensorManager.registerListener(kynRunner, linearAccelerationSensor, SensorManager.SENSOR_DELAY_GAME);
+		sensorManager.registerListener(kynRunner, rotationVectorSensor, SensorManager.SENSOR_DELAY_GAME);
 		isRunning = true;
 	}
 	
