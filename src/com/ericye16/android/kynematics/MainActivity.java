@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -42,10 +43,9 @@ public class MainActivity extends Activity {
 			@Override
 			public void run() {
 				runOnUiThread(new Runnable() {
-
 					@Override
 					public void run() {
-						updateUI();
+						(new UpdateUIValuesTask()).execute();
 					}
 					
 				});
@@ -55,12 +55,28 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	private void updateUI() {
-		updatePos();
-		updateVel();
-		updateAccel();
-		updateRot();
-		updateRotAngles();
+	private class UpdateUIValuesTask extends AsyncTask<Void, Void, Void> {
+		
+		private void updateUI() {
+			updatePos();
+			updateVel();
+			updateAccel();
+			updateRot();
+			updateRotAngles();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					updateUI();
+				}
+			});
+			return null;
+		}
+		
 	}
 
 	@Override
@@ -88,7 +104,7 @@ public class MainActivity extends Activity {
 	
 	public void reset(View view) {
 		kynematics.reset();
-		updateUI();
+		new UpdateUIValuesTask().execute();
 	}
 	
 	public void updateAccel() {

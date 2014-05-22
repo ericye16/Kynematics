@@ -15,5 +15,7 @@
     <string name="rotation_angles">Rotation angles: </string>
     <string name="position">Position: </string>
     <string name="vel">Vel: </string>
+    
+    <string name="back">Back</string>
 
 </resources>

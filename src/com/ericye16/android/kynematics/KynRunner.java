@@ -9,24 +9,18 @@ import android.util.Log;
 
 class KynRunner implements SensorEventListener {
 	
-	private Context context;
-	final private float[] position;
-	final private float[] R;
-	final private float[] velocity;
-	final private float[] lastAcceleration;
-	final private Sensor linearAccelerationSensor;
-	final private Sensor rotationVectorSensor;
+	final private Context context;
+	float[] position;
+	float[] R;
+	float[] velocity;
+	float[] lastAcceleration;
+	float[] accelVector;
+	Sensor linearAccelerationSensor;
+	Sensor rotationVectorSensor;
 	private long prevTimestamp = -1;
 	
-	public KynRunner(Context context, float[] position, float[] velocity, float[] lastAcceleration, 
-			float[] rotationMatrix, Sensor linearAccelerationSensor, Sensor rotationSensor) {
+	public KynRunner(Context context) {
 		this.context = context;
-		this.position = position;
-		this.velocity = velocity;
-		this.R = rotationMatrix;
-		this.linearAccelerationSensor = linearAccelerationSensor;
-		this.rotationVectorSensor = rotationSensor;
-		this.lastAcceleration = lastAcceleration;
 	}
 
 	@Override

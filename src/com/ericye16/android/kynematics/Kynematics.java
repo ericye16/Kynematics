@@ -1,6 +1,9 @@
 package com.ericye16.android.kynematics;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,6 +37,7 @@ public class Kynematics {
 			0,0,0,0
 			}; //length = 4 x 4 = 16
 	final private float[] orientationAngles = new float[] {0, 0, 0};
+	final private float[] accelVector = new float[] {0, 0, 0};
 	final private SensorManager sensorManager;
 	final private Sensor rotationVectorSensor;
 	final private Sensor linearAccelerationSensor;
@@ -49,8 +53,24 @@ public class Kynematics {
 		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 		linearAccelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-		kynRunner = new KynRunner(context, position, velocity, lastAcceleration, 
-				rotationMatrix, linearAccelerationSensor, rotationVectorSensor);
+		if (rotationVectorSensor == null || linearAccelerationSensor == null) {
+			String msg = "The following sensor(s) are missing: ";
+			msg += (rotationVectorSensor == null) ? "\nRotation Vector" : "";
+			msg += (linearAccelerationSensor == null) ? "\nLinear Accelertion" : "";
+			msg += ".";
+			AlertDialog.Builder builder =  new AlertDialog.Builder(context);
+			builder.setTitle("Sensor(s) Missing").setMessage(msg);
+			builder.setPositiveButton(R.string.back, new OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			AlertDialog dialog = builder.create();
+			dialog.show();
+		}
+		kynRunner = new KynRunner(context);
+		initKynRunner(kynRunner);
 		reset();
 	}
 	
@@ -81,7 +101,7 @@ public class Kynematics {
 			velocity[i] = 0;
 			lastAcceleration[i] = 0;
 		}
-		//zero out rotation matrix
+		//zero out / identity-ify rotation matrix
 		for (int i = 0; i < 16; i++) {
 			rotationMatrix[i] = 0;
 		}
@@ -182,6 +202,16 @@ public class Kynematics {
 		for (int i = 0; i < 3; i++) {
 			this.position[i] = position[i];
 		}
+	}
+	
+	private void initKynRunner(KynRunner kynRunner) {
+		kynRunner.position = position;
+		kynRunner.velocity = velocity;
+		kynRunner.lastAcceleration = lastAcceleration;
+		kynRunner.R = rotationMatrix;
+		kynRunner.accelVector = accelVector;
+		kynRunner.linearAccelerationSensor = linearAccelerationSensor;
+		kynRunner.rotationVectorSensor = rotationVectorSensor;
 	}
 	
 }
