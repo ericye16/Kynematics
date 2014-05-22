@@ -15,6 +15,7 @@ public class MainActivity extends Activity {
 	TextView accel_status;
 	TextView vel_status;
 	TextView rot_status;
+	TextView rot_angle;
 	TextView pos_status;
 	Button reset_button;
 	private Kynematics kynematics;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity {
 		accel_status = (TextView) findViewById(R.id.accel_status);
 		vel_status = (TextView) findViewById(R.id.vel_status);
 		rot_status = (TextView) findViewById(R.id.rotation_status);
+		rot_angle = (TextView) findViewById(R.id.rotation_angles);
 		pos_status = (TextView) findViewById(R.id.position_status);
 		reset_button = (Button) findViewById(R.id.reset_button);
 		kynematics = new Kynematics(this);
@@ -58,6 +60,7 @@ public class MainActivity extends Activity {
 		updateVel();
 		updateAccel();
 		updateRot();
+		updateRotAngles();
 	}
 
 	@Override
@@ -125,6 +128,12 @@ public class MainActivity extends Activity {
 		float[] vel = kynematics.getVelocity();
 		vel_status.setText("Vel: (" + vel[0] + "," + vel[1] + "," + vel[2] +
 				")");
+	}
+	
+	public void updateRotAngles() {
+		float[] angles = kynematics.getOrientationAngles();
+		rot_angle.setText("Rot angles: (" + angles[0] + "," + angles[1] + "," + 
+				angles[2] + ")");
 	}
 
 }

@@ -39,6 +39,12 @@
         android:text="@string/rotation" />
     
     <TextView 
+        android:id="@+id/rotation_angles"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/rotation_angles" />
+    
+    <TextView 
         android:id="@+id/position_status"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

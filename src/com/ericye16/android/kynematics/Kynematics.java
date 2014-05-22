@@ -33,6 +33,7 @@ public class Kynematics {
 			0,0,0,0,
 			0,0,0,0
 			}; //length = 4 x 4 = 16
+	final private float[] orientationAngles = new float[] {0, 0, 0};
 	final private SensorManager sensorManager;
 	final private Sensor rotationVectorSensor;
 	final private Sensor linearAccelerationSensor;
@@ -154,6 +155,17 @@ public class Kynematics {
 	 */
 	public float[] getRotationMatrix() {
 		return rotationMatrix;
+	}
+	
+	/**
+	 * Gets the current orientation angles, in azimuth, pitch and roll.
+	 * According to
+	 * {@link android.hardware.SensorManager#getOrientation(float[], float[]) getOrientation}
+	 * @return
+	 */
+	public float[] getOrientationAngles() {
+		SensorManager.getOrientation(rotationMatrix, orientationAngles);
+		return orientationAngles;
 	}
 	
 	/**
