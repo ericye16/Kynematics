@@ -178,13 +178,17 @@ public class Kynematics {
 	}
 	
 	/**
-	 * Gets the current orientation angles, in azimuth, pitch and roll.
+	 * Gets the current orientation angles, in azimuth, pitch and roll. Angles are
+	 * in degrees.
 	 * According to
 	 * {@link android.hardware.SensorManager#getOrientation(float[], float[]) getOrientation}
 	 * @return
 	 */
 	public float[] getOrientationAngles() {
 		SensorManager.getOrientation(rotationMatrix, orientationAngles);
+		for (int i = 0; i < 3; i++) {
+			orientationAngles[i] = (float) Math.toDegrees(orientationAngles[i]);
+		}
 		return orientationAngles;
 	}
 	
